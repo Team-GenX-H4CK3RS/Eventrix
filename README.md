@@ -1,6 +1,15 @@
 # Eventrix
 One stop event management platform build on [T3 Stack](https://create.t3.gg/) stack and Python. 
-## Literature Study (Competitor Analysis)
+
+## Problem Statement
+
+![WhatsApp Image 2025-02-24 at 17 32 32_2037d699](https://github.com/user-attachments/assets/861fbd22-8a6e-4ce1-b4cb-8abd40c25c07)
+
+## Inovation and Uniqueness - Our proposed MVP
+
+![WhatsApp Image 2025-02-24 at 17 33 02_724944fd](https://github.com/user-attachments/assets/81ef22b9-5f74-4227-9d6a-a24e4e845ea1)
+
+## Literature Study (Competitor Analysis - Identified Competitors:apps=> luma, cvent)
 ![WhatsApp Image 2025-02-24 at 07 15 45_737f9ae6](https://github.com/user-attachments/assets/555dabe7-e09b-4a1d-953a-ccee8b9fbbc9)
 ![WhatsApp Image 2025-02-24 at 07 19 16_e8d1cf25](https://github.com/user-attachments/assets/15ce41da-6845-42d4-a9cd-c2d19bdcf660)
 ![WhatsApp Image 2025-02-24 at 07 21 24_8983eebe](https://github.com/user-attachments/assets/204ef111-5aee-4185-b19e-ec0ea3e9131e)
