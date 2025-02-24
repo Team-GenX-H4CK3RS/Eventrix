@@ -16,7 +16,7 @@ export default async function Home() {
         <div className="flex h-screen items-center justify-center">
           <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-              Welcome to <span className="text-blue-800">EvMan</span>
+              Welcome to <span className="text-blue-800">Eventrix</span>
             </h1>
 
             <div className="flex flex-col items-center gap-2">

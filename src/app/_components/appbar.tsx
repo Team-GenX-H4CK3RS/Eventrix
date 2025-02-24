@@ -9,7 +9,7 @@ type AppBarProps = {
 export default function AppBar({ userName }: AppBarProps) {
   return (
     <div className="sticky top-0 flex w-full items-center border-b bg-white px-10 py-4">
-      <p className="text-2xl font-semibold">EvMan</p>
+      <p className="text-2xl font-semibold">Eventrix</p>
       <div className="flex-grow"></div>
       <div className="space-x-2">
         {userName ? <p>{userName}</p> : ""}
