@@ -1,9 +1,7 @@
 "use client";
-import z from "zod";
 import { api } from "~/trpc/react";
 import AppBar from "~/app/_components/appbar";
 import { useRouter } from "next/navigation";
-import { DateTime } from "next-auth/providers/kakao";
 
 export default function DashboardNewEvent({
   params,
@@ -25,11 +23,8 @@ export default function DashboardNewEvent({
             className="grid grid-cols-2 gap-12 text-xl"
             onSubmit={async (e) => {
               e.preventDefault();
-              const zdt = z.string().datetime({
-                local: true,
-              });
               const fd = new FormData(e.currentTarget);
-
+              const orgId = parseInt((await params).id);
               mutate(
                 {
                   title: fd.get("title") as string,
@@ -38,12 +33,15 @@ export default function DashboardNewEvent({
                   beginsOn: fd.get("beginsOn") as string,
                   endsOn: fd.get("endsOn") as string,
                   enrollEndsOn: fd.get("enrollEndsOn") as string,
-                  orgId: parseInt((await params).id),
+                  orgId: orgId,
                   tags: fd.get("tags") as string,
+                  imageUrl: fd.get("imageUrl") as string,
+                  enrollFee: parseFloat(fd.get("enrollFee") as string),
+                  visibility: fd.get("visibility") as string,
                 },
                 {
                   onSuccess(data) {
-                    router.push(`/dashboard/orgs/${data.id}`);
+                    router.push(`/dashboard/orgs/${orgId}`);
                   },
                 },
               );
@@ -74,6 +72,27 @@ export default function DashboardNewEvent({
               />
             </label>
             <label>
+              <p className="">Fees</p>
+              <input
+                type="number"
+                name="enrollFee"
+                defaultValue={0}
+                className="rounded-xl border px-4 py-1"
+              />
+            </label>
+            <label>
+              <p className="">Visibility</p>
+              <select
+                name="visibility"
+                defaultValue={0}
+                className="rounded-xl border px-4 py-1"
+              >
+                <option value="public">Public</option>
+                <option value="hidden">Hidden</option>
+                <option value="private">Private</option>
+              </select>
+            </label>
+            <label>
               <p className="">Starts On</p>
               <input
                 type="datetime-local"
@@ -82,7 +101,7 @@ export default function DashboardNewEvent({
               />
             </label>
             <label>
-              <p className="">Starts On</p>
+              <p className="">Ends On</p>
               <input
                 type="datetime-local"
                 name="endsOn"
@@ -102,6 +121,14 @@ export default function DashboardNewEvent({
               <input
                 type="text"
                 name="tags"
+                className="rounded-xl border px-4 py-1"
+              />
+            </label>
+            <label className="col-span-2 flex flex-col">
+              <p className="">Image Url</p>
+              <input
+                type="url"
+                name="imageUrl"
                 className="rounded-xl border px-4 py-1"
               />
             </label>

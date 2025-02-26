@@ -9,24 +9,20 @@ export const organisationRouter = createTRPCRouter({
       const org = await ctx.db.organisation.create({
         data: {
           name: input.name,
-          roles: {
-            create: { name: "Owner", hasCreated: true, hasAdmin: true },
-          },
-        },
-      });
-      const role = await ctx.db.organisationRole.create({
-        data: {
-          org: { connect: { id: org.id } },
-          name: "Owner",
-          hasCreated: true,
-          hasAdmin: false,
         },
       });
       const user = await ctx.db.organisationUser.create({
         data: {
-          user: { connect: { id: ctx.session.user.id } },
+          userEmail: ctx.session.user.email ?? "",
           org: { connect: { id: org.id } },
-          role: { connect: { id: role.id } },
+          role: {
+            create: {
+              org: { connect: { id: org.id } },
+              name: "Owner",
+              hasCreated: true,
+              hasAdmin: true,
+            },
+          },
         },
       });
       return org;
@@ -34,7 +30,12 @@ export const organisationRouter = createTRPCRouter({
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.organisation.findMany({
-      where: { members: { some: { userId: { equals: ctx.session.user.id } } } },
+      include: { events: true, members: true },
+      where: {
+        members: {
+          some: { userEmail: { equals: ctx.session.user.email ?? "" } },
+        },
+      },
     });
   }),
 
@@ -56,9 +57,89 @@ export const organisationRouter = createTRPCRouter({
     return (
       (await ctx.db.organisation.count({
         where: {
-          members: { some: { userId: { equals: ctx.session.user.id } } },
+          members: {
+            some: { userEmail: { equals: ctx.session.user.email ?? "" } },
+          },
         },
       })) !== 0
     );
   }),
+
+  getAllMembersByOrg: protectedProcedure
+    .input(
+      z.object({
+        orgId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.organisationUser.findMany({
+        where: { orgId: { equals: input.orgId } },
+        include: { role: true },
+      });
+    }),
+
+  hasAnyMembersById: protectedProcedure
+    .input(
+      z.object({
+        orgId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return (
+        (await ctx.db.organisationUser.count({
+          where: { orgId: { equals: input.orgId } },
+        })) !== 0
+      );
+    }),
+
+  createMember: protectedProcedure
+    .input(
+      z.object({
+        orgId: z.number(),
+        roleId: z.number(),
+        userEmail: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { orgId, roleId, ...oInput } = input;
+      return await ctx.db.organisationUser.create({
+        data: {
+          org: { connect: { id: orgId } },
+          role: { connect: { id: roleId } },
+          ...oInput,
+        },
+      });
+    }),
+
+  getRolesById: protectedProcedure
+    .input(
+      z.object({
+        orgId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.organisationRole.findMany({
+        where: { orgId: { equals: input.orgId } },
+      });
+    }),
+
+  createRole: protectedProcedure
+    .input(
+      z.object({
+        orgId: z.number(),
+        name: z.string(),
+        hasAdmin: z.boolean(),
+        hasJoined: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { orgId, ...oInput } = input;
+      return await ctx.db.organisationRole.create({
+        data: {
+          org: { connect: { id: orgId } },
+          ...oInput,
+          hasCreated: false,
+        },
+      });
+    }),
 });

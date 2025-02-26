@@ -3,7 +3,6 @@ import Link from "next/link";
 import { auth } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
 import AppBar from "~/app/_components/appbar";
-import { orgs } from "~/server/data.smpl";
 import { randomInt } from "crypto";
 
 export default async function Home() {
@@ -11,6 +10,7 @@ export default async function Home() {
 
   if (session?.user) {
     void api.org.hasAny.prefetch();
+    void api.org.getAll.prefetch();
   }
 
   return (
@@ -23,37 +23,43 @@ export default async function Home() {
               <p></p>
             </div>
           </div>
-          <div className="p-10">
-            <p className="text-xl font-semibold">Organisations</p>
+          <div className="px-10 py-4">
+            <div className="flex items-center px-10 py-2">
+              <p className="text-xl font-semibold">Organisations</p>
+              <div className="flex-grow"></div>
+              <Link
+                className="flex items-center rounded-xl border px-4 py-2"
+                href={`/dashboard/orgs/new`}
+              >
+                New
+              </Link>
+            </div>
+            <hr />
             <div className="flex w-screen gap-4 overflow-x-auto p-4">
-              {orgs.map((v) => (
+              {(await api.org.hasAny()) || (
+                <p className="px-6 text-lg">
+                  You are not a part of any organisation...
+                </p>
+              )}
+              {(await api.org.getAll()).map((v) => (
                 <Link
                   href={`/dashboard/orgs/${v.id}`}
                   key={v.id}
                   className="min-w-[400px] rounded-xl border p-4 text-lg"
                 >
                   <p className="text-xl font-semibold">{v.name}</p>
-                  <p className="text-sm text-blue-700">
-                    {v.eventsCount} Active Events
+                  <p className="text-sm">
+                    <span className="font-semibold text-blue-600">
+                      {(v.events as []).length}
+                    </span>{" "}
+                    Active Events
                   </p>
-                  <p className="text-sm text-red-700">
-                    {randomInt(30)} Queries Raised
+                  <p className="text-sm">
+                    <span className="font-semibold text-yellow-700">
+                      {(v.members as []).length}
+                    </span>{" "}
+                    Active Members
                   </p>
-                  <br />
-                  <p>Active Members:</p>
-                  <ul className="flex flex-wrap gap-2">
-                    {v.members.map((mem) => (
-                      <li
-                        className="flex items-center gap-1 rounded-full border px-2 py-1 text-sm"
-                        key={mem.id}
-                      >
-                        {mem.email}
-                        <span className="rounded-full bg-slate-200 px-1 py-0.5 text-xs">
-                          {mem.role}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
                 </Link>
               ))}
             </div>

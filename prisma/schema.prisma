@@ -14,36 +14,38 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Tag {
-    name String @id
-    users UserTag[]
-    events EventTag[]
-}
-
-model UserTag {
-    user    User   @relation(fields: [userId],references: [id], onDelete: Cascade)
-    userId  String
-    tag     Tag   @relation(fields: [tagName],references: [name], onDelete: Cascade)
-    tagName String
-
-    @@id([userId, tagName])
-}
-
-model EventTag {
-    event   Event  @relation(fields: [eventId],references: [id], onDelete: Cascade)
-    eventId Int
-    tag     Tag    @relation(fields: [tagName],references: [name], onDelete: Cascade)
-    tagName String
-
-    @@id([eventId, tagName])
-}
-
 model Organisation {
     id      Int                @id @default(autoincrement())
     name    String
     members OrganisationUser[]
     roles   OrganisationRole[]
     events  Event[]
+}
+
+model EventRegistration {
+    id        String @id @default(cuid())
+    userEmail String
+    event     Event @relation(fields: [eventId], references: [id])
+    eventId   Int
+    paymentStatus String
+    registrationStatus String
+    attendanceStatus Boolean
+}
+
+model EventChannel {
+    id        Int @id @default(autoincrement())
+    name      String
+    event     Event @relation(fields: [eventId], references: [id])
+    eventId   Int
+}
+
+model EventChannelMessage {
+    id        Int @id @default(autoincrement())
+    fromEmail String
+    toEmail   String
+    content   String
+    sentOn    DateTime @default(now())
+    receivedOn DateTime
 }
 
 model Event {
@@ -55,20 +57,24 @@ model Event {
     createdOn    DateTime     @default(now())
     beginsOn     DateTime
     endsOn       DateTime
+    imageUrl     String
+    enrollFee    Float
+    visibility   String
     org          Organisation @relation(fields: [orgId],references: [id], onDelete: Cascade)
     orgId        Int
-    eventTags    EventTag[]
+    tags         String
+    registrations EventRegistration[]
+    channels EventChannel[]
 }
 
 model OrganisationUser {
-    org      Organisation      @relation(fields: [orgId],references: [id], onDelete: Cascade)
-    orgId    Int
-    user     User              @relation(fields: [userId],references: [id], onDelete: Cascade)
-    userId   String
-    role     OrganisationRole? @relation(fields: [roleId],references: [id])
-    roleId   Int
+    org       Organisation      @relation(fields: [orgId],references: [id], onDelete: Cascade)
+    orgId     Int
+    userEmail String
+    role      OrganisationRole? @relation(fields: [roleId],references: [id])
+    roleId    Int
 
-    @@id([orgId, userId, roleId])
+    @@id([orgId, userEmail, roleId])
 }
 
 model OrganisationRole {
@@ -115,10 +121,8 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
-    userTags      UserTag[]
     accounts      Account[]
     sessions      Session[]
-    affilitedOrgs OrganisationUser[]
 }
 
 model VerificationToken {

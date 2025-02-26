@@ -12,3 +12,27 @@ export const saveFile = async (b64str: string) => {
   const base64Data = b64str.split(",");
   await writeFile("out.png", base64Data, "base64");
 };
+
+export function formatDateString(date: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "short",
+  }).format(new Date(date));
+}
+
+export const formatDateAs = {
+  mmmcdd: (date: Date) => {
+    return new Intl.DateTimeFormat("en-US", {
+      day: "2-digit",
+      month: "short",
+    }).format(new Date(date));
+  },
+};
+
+export function sadn(date: string) {
+  return new Date(date).getTime();
+}
+
+export function stdiso(date: string) {
+  return new Date(date).toISOString();
+}
