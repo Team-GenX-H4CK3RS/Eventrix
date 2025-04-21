@@ -42,14 +42,15 @@ export default async function OrgsEvents({
               </Link>
             </div>
             <hr />
-            <ul className="max-h-[300px] overflow-y-auto py-2">
+            <div className="max-h-[300px] overflow-y-auto py-2">
               {(await api.event.hasAnyByOrg(dtFilter)) || (
                 <p className="px-6 text-lg">
                   This organisation has no events...
                 </p>
               )}
               {(await api.event.getAllByOrg(dtFilter)).map((v) => (
-                <li
+                <Link
+                  href={`/dashboard/orgs/${orgId}/events/channels/`}
                   key={v.id}
                   className="flex items-center space-x-2 px-4 py-2"
                 >
@@ -70,9 +71,9 @@ export default async function OrgsEvents({
                       waiting
                     </p>
                   </div>
-                </li>
+                </Link>
               ))}
-            </ul>
+            </div>
           </div>
           <div className="px-10 py-4">
             <div className="flex items-center px-10 py-2">

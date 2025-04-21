@@ -78,6 +78,16 @@ export default async function EventView({
             >
               Register
             </Link>
+            {event?.enrollFee !== 0 ? (
+              <a
+                href={`https://razorpay.com/`}
+                className="rounded-xl bg-blue-700 py-3 text-center text-2xl font-semibold text-white"
+              >
+                Pay
+              </a>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </main>
